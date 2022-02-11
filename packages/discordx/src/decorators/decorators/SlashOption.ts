@@ -43,13 +43,19 @@ export function SlashOption(
 ): ParameterDecoratorEx {
   function getType(type: string): SlashOptionType {
     switch (type) {
+      case "MessageAttachment": {
+        return "ATTACHMENT";
+      }
+
       case "GUILDMEMBER": {
         return "USER";
       }
+
       case "TEXTCHANNEL":
       case "VOICECHANNEL": {
         return "CHANNEL";
       }
+
       case "FUNCTION":
         throw Error(
           `invalid slash option (${name}): ${type}\nSupported types are: ${SlashOptionTypes.join(

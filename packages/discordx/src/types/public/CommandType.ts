@@ -11,6 +11,7 @@ export type SubCommand = {
 };
 
 export const SlashOptionTypes = [
+  "ATTACHMENT",
   "STRING",
   "BOOLEAN",
   "INTEGER",
