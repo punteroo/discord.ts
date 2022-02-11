@@ -11,6 +11,7 @@ import type {
   DiscordAPIError,
   Interaction,
   Message,
+  ModalSubmitInteraction,
   SelectMenuInteraction,
   Snowflake,
 } from "discord.js";
@@ -114,6 +115,10 @@ export class Client extends ClientJS {
     return MetadataStorage.instance.buttonComponents;
   }
 
+  static get modalComponents(): readonly DComponent[] {
+    return MetadataStorage.instance.modalComponents;
+  }
+
   static get events(): readonly DOn[] {
     return MetadataStorage.instance.events;
   }
@@ -178,6 +183,10 @@ export class Client extends ClientJS {
 
   get buttonComponents(): readonly DComponent[] {
     return Client.buttonComponents;
+  }
+
+  get modalComponents(): readonly DComponent[] {
+    return Client.modalComponents;
   }
 
   get events(): readonly DOn[] {
@@ -1014,6 +1023,11 @@ export class Client extends ClientJS {
       return this.executeComponent(this.selectMenuComponents, interaction, log);
     }
 
+    // if interaction is a select menu
+    if (interaction.isModalSubmit()) {
+      return this.executeComponent(this.modalComponents, interaction, log);
+    }
+
     // if interaction is context menu
     if (interaction.isContextMenu()) {
       return this.executeContextMenu(interaction, log);
@@ -1081,7 +1095,10 @@ export class Client extends ClientJS {
    */
   async executeComponent(
     components: readonly DComponent[],
-    interaction: ButtonInteraction | SelectMenuInteraction,
+    interaction:
+      | ButtonInteraction
+      | ModalSubmitInteraction
+      | SelectMenuInteraction,
     log?: boolean
   ): Promise<unknown> {
     const botResolvedGuilds = await this.botResolvedGuilds;
