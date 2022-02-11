@@ -11,7 +11,7 @@ import { DComponent, MetadataStorage } from "../../index.js";
  * [View Documentation](https://discord-ts.js.org/docs/decorators/gui/selectmenucomponent)
  * @category Decorator
  */
-export function SelectMenuComponent(id?: string | RegExp): MethodDecoratorEx;
+export function SelectMenu(id?: string | RegExp): MethodDecoratorEx;
 
 /**
  * Define a select menu interaction handler
@@ -21,12 +21,12 @@ export function SelectMenuComponent(id?: string | RegExp): MethodDecoratorEx;
  * [View Documentation](https://discord-ts.js.org/docs/decorators/gui/selectmenucomponent)
  * @category Decorator
  */
-export function SelectMenuComponent(
+export function SelectMenu(
   id: string | RegExp,
   params?: { botIds?: string[]; guilds?: IGuild[] }
 ): MethodDecoratorEx;
 
-export function SelectMenuComponent(
+export function SelectMenu(
   id?: string | RegExp,
   params?: { botIds?: string[]; guilds?: IGuild[] }
 ): MethodDecoratorEx {

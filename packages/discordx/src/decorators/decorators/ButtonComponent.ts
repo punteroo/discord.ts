@@ -11,7 +11,7 @@ import { DComponent, MetadataStorage } from "../../index.js";
  * [View Documentation](https://discord-ts.js.org/docs/decorators/gui/buttoncomponent)
  * @category Decorator
  */
-export function ButtonComponent(id?: string | RegExp): MethodDecoratorEx;
+export function Button(id?: string | RegExp): MethodDecoratorEx;
 
 /**
  * Define button interaction handler
@@ -21,12 +21,12 @@ export function ButtonComponent(id?: string | RegExp): MethodDecoratorEx;
  * [View Documentation](https://discord-ts.js.org/docs/decorators/gui/buttoncomponent)
  * @category Decorator
  */
-export function ButtonComponent(
+export function Button(
   id: string | RegExp,
   params?: { botIds?: string[]; guilds?: IGuild[] }
 ): MethodDecoratorEx;
 
-export function ButtonComponent(
+export function Button(
   id?: string | RegExp,
   params?: { botIds?: string[]; guilds?: IGuild[] }
 ): MethodDecoratorEx {

@@ -1,11 +1,10 @@
-import type { AutocompleteInteraction } from "discord.js";
-
 import type {
-  ChannelTypes,
-  DApplicationCommand,
-  IGuild,
-  SlashOptionType,
-} from "../../index.js";
+  ApplicationCommandOptionType,
+  AutocompleteInteraction,
+  ChannelType,
+} from "discord.js";
+
+import type { DApplicationCommand, IGuild } from "../../index.js";
 
 export type ApplicationCommandParams = {
   botIds?: string[];
@@ -25,17 +24,19 @@ export type SlashOptionBaseParams = SlashOptionBase & {
   maxValue?: undefined;
   minValue?: undefined;
   type?: Exclude<
-    SlashOptionType,
-    "SUB_COMMAND" | "SUB_COMMAND_GROUP" | "CHANNEL"
+    ApplicationCommandOptionType,
+    | ApplicationCommandOptionType.Subcommand
+    | ApplicationCommandOptionType.SubcommandGroup
+    | ApplicationCommandOptionType.Channel
   >;
 };
 
 export type SlashOptionChannelParams = SlashOptionBase & {
   autocomplete?: undefined;
-  channelTypes?: ChannelTypes[];
+  channelTypes?: ChannelType[];
   maxValue?: undefined;
   minValue?: undefined;
-  type: "CHANNEL";
+  type: ApplicationCommandOptionType.Channel;
 };
 
 export type SlashOptionAutoCompleteParams = SlashOptionBase & {
@@ -43,7 +44,10 @@ export type SlashOptionAutoCompleteParams = SlashOptionBase & {
   channelTypes?: undefined;
   maxValue?: undefined;
   minValue?: undefined;
-  type: "STRING" | "NUMBER" | "INTEGER";
+  type:
+    | ApplicationCommandOptionType.String
+    | ApplicationCommandOptionType.Number
+    | ApplicationCommandOptionType.Integer;
 };
 
 export type SlashOptionNumberParams = SlashOptionBase & {
@@ -51,7 +55,9 @@ export type SlashOptionNumberParams = SlashOptionBase & {
   channelTypes?: undefined;
   maxValue?: number;
   minValue?: number;
-  type: "NUMBER" | "INTEGER";
+  type:
+    | ApplicationCommandOptionType.Number
+    | ApplicationCommandOptionType.Integer;
 };
 
 export type SlashOptionParams =
