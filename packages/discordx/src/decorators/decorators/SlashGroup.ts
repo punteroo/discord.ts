@@ -1,11 +1,7 @@
 import type { ClassMethodDecorator } from "@discordx/internal";
 import { Modifier } from "@discordx/internal";
 
-import type {
-  DApplicationCommandOption,
-  SubCommand,
-  VerifyName,
-} from "../../index.js";
+import type { DApplicationCommandOption, TSlashGroup } from "../../index.js";
 import {
   DApplicationCommand,
   DApplicationCommandGroup,
@@ -14,19 +10,6 @@ import {
 
 /**
  * Group your slash command
- * @param group name of group
- * ___
- * [View Discord.ts Documentation](https://discord-ts.js.org/docs/decorators/commands/slashgroup)
- *
- * [View Discord Documentation](https://discord.com/developers/docs/interactions/application-commands#subcommands-and-subcommand-groups)
- * @category Decorator
- */
-export function SlashGroup<T extends string>(
-  group: VerifyName<T>
-): ClassMethodDecorator;
-
-/**
- * Group your slash command
  * @param subCommands object
  * ___
  * [View Discord.ts Documentation](https://discord-ts.js.org/docs/decorators/commands/slashgroup)
@@ -34,60 +17,9 @@ export function SlashGroup<T extends string>(
  * [View Discord Documentation](https://discord.com/developers/docs/interactions/application-commands#subcommands-and-subcommand-groups)
  * @category Decorator
  */
-export function SlashGroup(subCommands: SubCommand): ClassMethodDecorator;
+export function SlashGroup(info: TSlashGroup): ClassMethodDecorator;
 
-/**
- * Group your slash command
- * @param group name of group
- * @param description string
- * ___
- * [View Discord.ts Documentation](https://discord-ts.js.org/docs/decorators/commands/slashgroup)
- *
- * [View Discord Documentation](https://discord.com/developers/docs/interactions/application-commands#subcommands-and-subcommand-groups)
- * @category Decorator
- */
-export function SlashGroup<T extends string>(
-  group: VerifyName<T>,
-  description: string
-): ClassMethodDecorator;
-
-/**
- * Group your slash command
- * @param group name of group
- * @param subCommands object
- * ___
- * [View Discord.ts Documentation](https://discord-ts.js.org/docs/decorators/commands/slashgroup)
- *
- * [View Discord Documentation](https://discord.com/developers/docs/interactions/application-commands#subcommands-and-subcommand-groups)
- * @category Decorator
- */
-export function SlashGroup<T extends string>(
-  group: VerifyName<T>,
-  subCommands: SubCommand
-): ClassMethodDecorator;
-
-/**
- * Group your slash command
- * @param group name of group
- * @param description string
- * @param subCommands object
- * ___
- * [View Discord.ts Documentation](https://discord-ts.js.org/docs/decorators/commands/slashgroup)
- *
- * [View Discord Documentation](https://discord.com/developers/docs/interactions/application-commands#subcommands-and-subcommand-groups)
- * @category Decorator
- */
-export function SlashGroup<T extends string>(
-  group: VerifyName<T>,
-  description: string,
-  subCommands: SubCommand
-): ClassMethodDecorator;
-
-export function SlashGroup(
-  groupOrSubcommands: string | SubCommand,
-  subCommandsOrDescription?: SubCommand | string,
-  subCommands?: SubCommand
-): ClassMethodDecorator {
+export function SlashGroup(info: TSlashGroup): ClassMethodDecorator {
   return function <T>(
     target: T,
     key?: string,
@@ -95,46 +27,36 @@ export function SlashGroup(
   ) {
     const myClass = target as unknown as new () => unknown;
 
-    if (descriptor && typeof groupOrSubcommands === "string" && key) {
+    if (descriptor) {
       // If @SlashGroup decorate a method edit the method and add it to subgroup
       MetadataStorage.instance.addModifier(
         Modifier.create<DApplicationCommand>((original) => {
           if (original.type === "CHAT_INPUT") {
-            original.subgroup = groupOrSubcommands;
+            original.group = info.root ?? info.name;
+            original.subgroup = info.root ? info.name : undefined;
           }
-        }, DApplicationCommand).decorate(myClass.constructor, key)
+        }, DApplicationCommand).decorate(
+          myClass.constructor,
+          key ?? myClass.name
+        )
       );
-    }
-
-    if (typeof groupOrSubcommands === "string") {
-      const group = DApplicationCommandGroup.create<DApplicationCommand>(
-        groupOrSubcommands,
-        {
-          description:
-            typeof subCommandsOrDescription === "string"
-              ? subCommandsOrDescription
-              : undefined,
-        }
-      ).decorate(myClass, key ?? myClass.name);
-      MetadataStorage.instance.addApplicationCommandSlashGroups(group);
-    }
-
-    // Create a subgroup if @SlashGroup decorate a method
-    const anySubCommands = subCommands
-      ? subCommands
-      : typeof subCommandsOrDescription !== "string"
-      ? subCommandsOrDescription
-      : undefined;
-
-    if (anySubCommands) {
-      Object.keys(anySubCommands).forEach((subKey) => {
-        const group =
-          DApplicationCommandGroup.create<DApplicationCommandOption>(subKey, {
-            description: anySubCommands?.[subKey],
-          }).decorate(myClass, myClass.name);
-
-        MetadataStorage.instance.addApplicationCommandSlashSubGroups(group);
-      });
+    } else {
+      if (info.root) {
+        MetadataStorage.instance.addApplicationCommandSlashSubGroups(
+          DApplicationCommandGroup.create<DApplicationCommandOption>(
+            info.name,
+            {
+              description: info.description,
+            }
+          ).decorate(myClass, myClass.name)
+        );
+      } else {
+        MetadataStorage.instance.addApplicationCommandSlashGroups(
+          DApplicationCommandGroup.create<DApplicationCommand>(info.name, {
+            description: info.description,
+          }).decorate(myClass, key ?? myClass.name)
+        );
+      }
     }
   };
 }
